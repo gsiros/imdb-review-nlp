@@ -1,5 +1,5 @@
 import math
-from unittest import result
+
 class ID3Node:
     def __init__(self, parent=None, attribute=None):
         # Father of node
@@ -138,7 +138,7 @@ class ID3:
             
 
 
-    def buildTree(self, preset = True, stop_threshold = 0.05):
+    def buildTree(self, preset = False, stop_threshold = 0.1):
         """Builds the decision tree based on training vectors.
         
         trainingVectors -- (list) the training vectors; list of 0-1 lists
@@ -252,8 +252,8 @@ class ID3:
 
         #since keys can either exist or not exist in a review, we only need to make 2 children
         #we pass the key list without the key we used in this step (best key)
-        node.setLeft(self.__id3(with_key, keys[:best_index]+keys[best_index+1:], preset, stop_threshold))
-        node.setRight(self.__id3(without_key, keys[:best_index]+keys[best_index+1:], preset, stop_threshold))
+        node.setLeft(self.__id3(without_key, keys[:best_index]+keys[best_index+1:], preset, stop_threshold))
+        node.setRight(self.__id3(with_key, keys[:best_index]+keys[best_index+1:], preset, stop_threshold))
         return node
 
     def printTree(self):
@@ -276,8 +276,3 @@ class ID3:
                 stack.append(index.getLeft())
                 stack.append(index.getRight())
         print(string) 
-
-nbc = ID3()
-nbc.train("C:/Users/tatou/OneDrive - aueb.gr/Desktop/ai_ergasia2/imdb-review-nlp-main/vectors/vectors_keys30_80.0.txt")
-nbc.buildTree()
-print(nbc.classify("C:/Users/tatou/OneDrive - aueb.gr/Desktop/ai_ergasia2/imdb-review-nlp-main/aclImdb/test/neg/2_3.txt"))

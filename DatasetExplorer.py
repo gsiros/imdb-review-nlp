@@ -52,7 +52,7 @@ class DatasetExplorer:
         i = 0
         for entry in self.attr.keys():
             if i < M: 
-                print(entry, self.attr[entry][1], self.attr[entry][0], sep=" ")
+                print(entry, self.attr[entry][1], self.attr[entry][0])
                 i+=1
 
     def __calcInfoGain(self, M):
@@ -90,7 +90,7 @@ class DatasetExplorer:
                         outf.write(word+"\n")
                     else:
                         outf.write(word)
-                    print(word, self.gains[word], sep = " ")
+                    print(word, self.gains[word])
                     i+=1
                 else:
                     break
@@ -166,5 +166,5 @@ class DatasetExplorer:
 
 de = DatasetExplorer(12500)
 #de.loadExamples("aclImdb/train/pos", "aclImdb/train/neg")
-#de.createKeys(30)
-de.transformData("keys/keys30_100.txt", "aclImdb/train/pos", "aclImdb/train/neg", 0.8)
+#de.createKeys(200)
+de.transformData("keys/keys200_100.txt", "aclImdb/train/pos", "aclImdb/train/neg")

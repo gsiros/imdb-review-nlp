@@ -1,36 +1,5 @@
 import os
 
-def test(classifyfunc, pospath, negpath, limiter):
-    i = 0
-    counter = 0 
-    correct = 0
-    for filename in os.listdir(pospath):
-        if i < limiter:
-            path = os.path.join(pospath, filename)
-            print(path)
-            res = classifyfunc(path)
-            if res == 1:
-                correct += 1
-            counter += 1
-            i += 1
-        else: 
-            break
-    i = 0       
-    for filename in os.listdir(negpath):
-        if i < limiter:
-            path = os.path.join(negpath, filename)
-            print(path)
-            res = classifyfunc(path)
-            if res == 0:
-                correct += 1
-            counter += 1
-            i += 1
-        else:
-            break
-        
-    print("--- STATS ---")
-    print("Accuracy: ", (correct/counter)*100, "%")
-
 class NaiveBayesClassifier():
     
     def __init__(self):
@@ -51,6 +20,7 @@ class NaiveBayesClassifier():
                 vector = line.strip("\n").split(",")
                 vector = [int(item) for item in vector]
                 self.vectors.append(vector)
+            
     
     def classify(self, revpath):
         # Vector-ify the review text...
@@ -65,6 +35,7 @@ class NaiveBayesClassifier():
                 if cleanWord in self.keys:
                     #print(cleanWord)
                     rev_vector[self.keys.index(cleanWord)] = 1
+        #print(rev_vector)
         # if P(C = 1 | X) > P(C = 0 | X)
         #   RETURN 1
 
@@ -75,39 +46,41 @@ class NaiveBayesClassifier():
         attr_counter_pos = [0 for _ in range(len(self.keys))]
         attr_counter_neg = [0 for _ in range(len(self.keys))]
 
+        # for every training vector
         for vector in self.vectors:
-            if vector[-1] == 1:
-                for i in range(len(vector)-1):
-                    if rev_vector[i] == 1:
-                        attr_counter_pos[i] += vector[i]
-            else:
-                for i in range(len(vector)-1):
-                    if rev_vector[i] == 1:
-                        attr_counter_neg[i] += vector[i]
+            # check every key attribute
+            for i in range(len(self.keys)):
+                # if review vector is positive:
+                if vector[-1] == 1:
+                    # if the vector has a key attribute
+                    if vector[i] == rev_vector[i]:
+                        attr_counter_pos[i] += 1
+                else:
+                    if vector[i] == rev_vector[i]:
+                        attr_counter_neg[i] += 1
+                            
 
        
         pc1x = (1/2)
         for counter in attr_counter_pos:
             if counter != 0:
-                pc1x *= counter / (len(self.vectors) // 2)
+                pc1x *= counter / (len(self.vectors ) // 2)
             else:
                 pc1x *= 1 / ((len(self.vectors) // 2) + 2)
 
         pc0x = (1/2)
         for counter in attr_counter_neg:
             if counter != 0:
-                pc0x *= counter / (len(self.vectors) // 2)
+                pc0x *= (counter / (len(self.vectors) // 2))
             else:
-                pc0x *= 1 / ((len(self.vectors) // 2) + 2)
+                pc0x *= (1 / ((len(self.vectors) // 2) + 2))
 
-        #print(pc1x, pc0x)
         if pc1x > pc0x:
-            return 1
+            return True
         else:
-            return 0
+            return False
 
-nbc = NaiveBayesClassifier()
-nbc.train("vectors/vectors_keys100_100.txt")
+#nbc = NaiveBayesClassifier()
+#nbc.train("vectors/vectors_keys100_100.txt")
 #print(nbc.classify("aclImdb/test/pos/8_9.txt"))
-test(nbc.classify, "aclImdb/test/pos", "aclImdb/test/neg", 200)
 #print(nbc.classify("aclImdb/test/neg/12398_1.txt"))
