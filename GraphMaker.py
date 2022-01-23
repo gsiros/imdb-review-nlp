@@ -12,7 +12,7 @@ for i in range(10,51,10):
     precis2 = []
     recall2 = []
 
-    with open("test/randfor/TEST_out_keys{}.txt".format(i), "r") as f:
+    with open("test/nbc/TEST_out_keys{}.txt".format(i), "r") as f:
         lines = f.readlines()
         data = [line.split(",") for line in lines]
         data = sorted(data, key=lambda x : float(x[0]))
@@ -22,7 +22,7 @@ for i in range(10,51,10):
         precis = [float(line[2]) for line in data]
         recall = [float(line[3]) for line in data]
 
-    with open("test/randfor/TRAIN_out_keys{}.txt".format(i), "r") as f:
+    with open("test/nbc/TRAIN_out_keys{}.txt".format(i), "r") as f:
         lines = f.readlines()
         data = [line.split(",") for line in lines]
         data = sorted(data, key=lambda x : float(x[0]))
@@ -36,7 +36,7 @@ for i in range(10,51,10):
     plt.plot(perc2, acc2, '-b', label="train data")
     #plt.plot(perc, [min(acc) for _ in perc], '--r', label="expected error")
 
-    plt.title("Random Forest Learning Curves - {} keys, 9 trees (ID3 Instances)".format(i))
+    plt.title("Naive Bayes Classifier - {} keys".format(i))
     plt.xlabel("percentage of training data")
     plt.ylabel("error")
     plt.legend() # required to show the labels

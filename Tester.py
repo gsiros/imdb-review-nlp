@@ -218,8 +218,8 @@ class Tester:
 
 nbc = NaiveBayesClassifier()
 ts = Tester(nbc)
-#ts.buildTestVectorFiles(50,"aclImdb/train/pos", "aclImdb/train/neg")
-ts.run_test(50,"aclImdb/test/pos", "aclImdb/test/neg")
+ts.buildTestVectorFiles(100,"aclImdb/train/pos", "aclImdb/train/neg")
+#ts.run_test(50,"aclImdb/test/pos", "aclImdb/test/neg")
 
 #nbc.train("vectors/vectors_keys100_100.txt")
 #test(nbc.classify, "aclImdb/test/pos", "aclImdb/test/neg",10)
