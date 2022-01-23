@@ -1,0 +1,7 @@
+training_data_percentage,accuracy,precision,recall
+20,76.5,60,40
+30,76.5,60,40
+40,76.5,60,40
+50,76.5,60,40
+60,76.5,60,40
+70,76.5,60,40

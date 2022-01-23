@@ -77,12 +77,23 @@ class DatasetExplorer:
             self.gains[word] = hc - ((prob_of_word*hcX1) + ((1-prob_of_word)*hcX0))
 
         self.gains = dict(sorted(self.gains.items(), key= lambda x: x[1], reverse=True))
+        commonwords = []
+        with open("non_negative_or_positive_connotation_words.txt", 'r') as f:
+            text = f.read()
+            words = text.split("\n")
+            commonwords.extend([word.strip(".,!").upper() for word in words])
+        for key in list(self.gains.keys()):
+            if key.isnumeric() or "/" in key:
+                del self.gains[key]
+            elif key in commonwords:
+                if self.gains[key] < 0.01:
+                    del self.gains[key]
         
 
     def createKeys(self, M):
         self.__calcInfoGain(M)
-        filename = "keys{}_{}.txt".format(M, self.percentage*100)
-        with open("keys/"+filename, "w") as outf:
+        filename = "keys{}_{}.txt".format(M, self.percentage)
+        with open("keys/TEST"+filename, "w") as outf:
             i,limit = 0,M
             for word in self.gains.keys():
                 if i < limit:
@@ -148,7 +159,7 @@ class DatasetExplorer:
                     vectors.append(vector)
             limiter += 1
         
-        vectorfilename = "vectors/vectors_keys{}_{}.txt".format(len(keys), perc*100)
+        vectorfilename = "vectors/vectors_keys{}_{}.txt".format(len(keys), float(perc))
         with open(vectorfilename, "w") as vectorfile:
             header = ""
             for key in keys:
@@ -164,7 +175,7 @@ class DatasetExplorer:
         else: 
             return - (prob * math.log2(prob)) - ((1-prob)*math.log2(1-prob))
 
-de = DatasetExplorer(12500)
+#de = DatasetExplorer(12500)
 #de.loadExamples("aclImdb/train/pos", "aclImdb/train/neg")
 #de.createKeys(200)
-de.transformData("keys/keys200_100.txt", "aclImdb/train/pos", "aclImdb/train/neg")
+#de.transformData("keys/keysfiltered159_100.txt", "aclImdb/train/pos", "aclImdb/train/neg")
