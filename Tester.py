@@ -99,7 +99,7 @@ class Tester:
             
             # calcualte statistics
             print("Saving to file...")
-            with open("test/{}/TEST_out_keys{}.txt".format(self.classifier, keyNum),"a") as f:
+            with open("test/{}/TRAIN_out_keys{}.txt".format(self.classifier, keyNum),"a") as f:
                 accuracy = (correct/total_checked)
                 precision = (true_positives)/(true_positives+false_positives)
                 recall = (true_positives)/(true_positives+false_negatives)
@@ -165,7 +165,7 @@ class Tester:
             
             # calcualte statistics
             print("Saving to file...")
-            with open("test/{}/TEST_out_keys{}.txt".format(self.classifier, keyNum),"a") as f:
+            with open("test/{}/TRAIN_out_keys{}.txt".format(self.classifier, keyNum),"a") as f:
                 accuracy = (correct/total_checked)
                 precision = (true_positives)/(true_positives+false_positives)
                 recall = (true_positives)/(true_positives+false_negatives)
@@ -218,8 +218,8 @@ class Tester:
 
 nbc = NaiveBayesClassifier()
 ts = Tester(nbc)
-ts.buildTestVectorFiles(100,"aclImdb/train/pos", "aclImdb/train/neg")
-#ts.run_test(50,"aclImdb/test/pos", "aclImdb/test/neg")
+#ts.buildTestVectorFiles(100,"aclImdb/train/pos", "aclImdb/train/neg")
+ts.run_test(70,"aclImdb/train/pos", "aclImdb/train/neg")
 
 #nbc.train("vectors/vectors_keys100_100.txt")
 #test(nbc.classify, "aclImdb/test/pos", "aclImdb/test/neg",10)

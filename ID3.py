@@ -4,9 +4,9 @@ class ID3Node:
     def __init__(self, parent=None, attribute=None):
         # Father of node
         self.parent = parent
-        # Left child (Positive, 1)
+        # Left child (DOES NOT have the current attribute-keyword)
         self.left = None
-        # Right chid (Negative, 0)
+        # Right chid (DOES have the current attribute-keyword)
         self.right = None
         # The attribute
         self.attribute = attribute
@@ -70,80 +70,83 @@ class ID3Node:
         return self.preset
 
     def __str__(self) -> str:
-        #return "NODE: {},\nLEFT: {},\nRIGHT: {}".format(self.attribute, self.left.getAttribute(), self.right.getAttribute())
         return str(self.attribute)
-        #return "[ \n\tAttribute:'{}',\n\tLeftChild:'{}',\n\tRightChild:'{}',\n\tNumOfPos:'{}',\n\tNumOfNeg:'{}',\n\tSum:'{}'\n]".format(
-            #self.attribute,
-            #self.left,
-            #self.right,
-            #self.numPos,
-            #self.numNeg,
-            #self.sum
-        #)
+        
     
 class ID3:
-
+    """ID3 Classifier class"""
     
     def __init__(self, keys = [], vectors = []):
         self.keys = keys
         self.vectors = vectors
         self.gains = {}
-        self.desision_tree = None
+        self.desision_tree_root_root = None
         self.hc = 0
 
-    
-
-
-    #loads training data
     def train(self, trainingVectorsPath): 
+        """Method that trains the algorithm from the training vector file provided.
 
-        #flushing data structures
+        trainingVectorsPath -- (str) path to the training vector file.
+        """
+
+        # Flush data structures for training...
         self.keys = []
         self.vectors = []
         self.gains = {}
-        self.desision_tree = None
+        self.desision_tree_root_root = None
 
+        # Open the training vector file:
         with open(trainingVectorsPath, "r") as trainingfile:
             lines = trainingfile.readlines()
 
-            # get keys
+            # Read the keyword line and extract the keywords:
             self.keys.extend(lines[0].split(","))
             self.keys.pop(-1)
             lines.pop(0)
             
+            # Count how many vectors are positive
             count_pos = 0
-            # get the training vectors
+            # Read the rest of the training vectors and parse them
+            # to a list:
             for line in lines:
                 vector = line.strip("\n").split(",")
                 vector = [int(item) for item in vector]
                 count_pos += vector[-1]
                 self.vectors.append(vector)
+            # Calculate the entropy for the positive category:
             self.hc = self.__binEntropy(count_pos/len(self.vectors))
             
 
-
     def classify(self, revpath):
-        """Classifies a review to POSITIVE or NEGATIVE.
-        revpath -- the path of the review .txt file
-        """
-        # to implement
+        """Main classification method that classifies a review as positive (True) or negative (False)
+        
+        revpath - (str) path to the review file"""
+        
+        # Initialize a dummy training vector full of 0s.     
         rev_vector = [0 for _ in range(len(self.keys)+1)]
+
+        # Open the review file:
         with open(revpath, "r") as revfile:
             rev_text = revfile.read()
-            #print(rev_text)
             words = rev_text.split(" ")
             for word in words:
                 cleanWord = word.strip(".,!").upper()
                 if cleanWord in self.keys:
-                    #print(cleanWord)
+                    # Vector-ify the review text...
+                    # ex. review_vector[indexOf('BAD')] = 1
                     rev_vector[self.keys.index(cleanWord)] = 1
 
-        curr_node = self.desision_tree
-        while curr_node != None: #We have not reched a leaf
-            if curr_node.getAttribute() != None:
+        # Traverse the decision tree, starting from the root:
+        curr_node = self.desision_tree_root
+        while curr_node != None: # We have not reched a leaf
+            
+            if curr_node.getAttribute() != None: # We have not reached a preset-leaf
+                # If node's keyword appears in the incoming to-be-classified
+                # review vector, move to the right child node 
                 if rev_vector[self.keys.index(curr_node.getAttribute())] == 1:
                     curr_node = curr_node.getRight()
                 else:
+                    # Else move to the left side:
                     curr_node = curr_node.getLeft()
             else:
                 return curr_node.getPreset()
@@ -159,10 +162,8 @@ class ID3:
         """
         # build the tree...
         print("Building decision tree...")
-        self.desision_tree = self.__id3(self.vectors, self.keys, preset, stop_threshold)
+        self.desision_tree_root_root = self.__id3(self.vectors, self.keys, preset, stop_threshold)
 
-        
-        
         
     # calculate most valuable key and return it
     def __bestKey(self, vectors, keys):
@@ -267,27 +268,6 @@ class ID3:
         node.setLeft(self.__id3(without_key, keys[:best_index]+keys[best_index+1:], preset, stop_threshold))
         node.setRight(self.__id3(with_key, keys[:best_index]+keys[best_index+1:], preset, stop_threshold))
         return node
-
-    def printTree(self):
-        string = ""
-        stack = []
-        stack.append(self.desision_tree)
-        while len(stack) != 0:
-            print("heil")
-            index = stack.pop()
-            if index != None:
-                if index.getAttribute() != None:
-                    string += index.getAttribute() + "({})".format(str(index.getParent())) + "\n"
-                else:
-                    string += str(index.getPreset()) + "({})".format(str(index.getParent())) + "\n"
-                
-                if index.getLeft() != None:
-                    index.getLeft().setParent(index)
-                if index.getRight() != None:
-                    index.getRight().setParent(index)
-                stack.append(index.getLeft())
-                stack.append(index.getRight())
-        print(string)
 
     def __str__(self):
         return "id3"
