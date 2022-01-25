@@ -1,7 +1,8 @@
 from random import randint, sample, shuffle
 from ID3 import ID3
 
-class Random_Forest():
+class Random_Forest:
+    """Random Forest Classifier class"""
 
     def __init__(self):
         self.vectors = []
@@ -9,25 +10,33 @@ class Random_Forest():
         self.trees = []
 
     def train(self, trainingVectorsPath): 
-        
-        # flushing data structures
+        """Method that trains the algorithm from the training vector file provided.
+
+        trainingVectorsPath -- (str) path to the training vector file.
+        """
+
+        # Flush data structures for training...
         self.vectors = []
         self.keys = []
         self.trees = []
         
-        with open(trainingVectorsPath, "r") as trainingfile:
+        # Open the training vector file:
+        with open(trainingVectorsPath, "r", encoding='utf-8') as trainingfile:
             lines = trainingfile.readlines()
 
-            # get keys
+            # Read the keyword line and extract the keywords:
             self.keys.extend(lines[0].split(","))
             self.keys.pop(-1)
             lines.pop(0)
             
-            # get the training vectors
+            # Read the rest of the training vectors and parse them
+            # to a list:
             for line in lines:
                 vector = line.strip("\n").split(",")
                 vector = [int(item) for item in vector]
                 self.vectors.append(vector)
+            # Shuffle the order of training vectors to increase
+            # the randomness of the tree bags.
             shuffle(self.vectors)
 
     def random_forest(self, m, forest_size, preset, stop_threshold):
@@ -49,18 +58,21 @@ class Random_Forest():
                 cleared_random_vector.append(picked_vector[-1])
                 # add vector to tree vectors
                 tree_vecs.append(cleared_random_vector)
-            self.trees.append(ID3(tree_keys, tree_vecs))#create an ID3 object and add it to the forest
-            self.trees[-1].buildTree(preset, stop_threshold)#build it's desision tree with the vectors created
+            
+            #create an ID3 object and add it to the forest    
+            self.trees.append(ID3(tree_keys, tree_vecs))
+            #build it's desision tree with the vectors created
+            self.trees[-1].buildTree(preset, stop_threshold)
             print("Tree #{} successfully built.".format(num+1))
 
 
     def classify(self, revpath):
-        #classify in each tree
+        # Call the classify method on each ID3 instance:
         results = []
         for item in self.trees: 
             results.append(item.classify(revpath))
 
-        #count votes
+        # Count votes:
         counter_pos = 0 
         counter_neg = 0
         for item in results:

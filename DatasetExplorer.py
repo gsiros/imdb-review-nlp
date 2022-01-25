@@ -41,7 +41,7 @@ class DatasetExplorer:
         for filename in os.listdir(pospath):
             if limiter < numOfExamples:
                 # Open file:
-                with open(os.path.join(pospath, filename), 'r') as f:
+                with open(os.path.join(pospath, filename), 'r', encoding='utf-8') as f:
                     # Read the review and split it to each
                     # individual word.
                     text = f.read()
@@ -75,7 +75,7 @@ class DatasetExplorer:
         limiter = 0
         for filename in os.listdir(negpath):
             if limiter < numOfExamples:
-                with open(os.path.join(negpath, filename), 'r') as f:
+                with open(os.path.join(negpath, filename), 'r', encoding='utf-8') as f:
                     text = f.read()
                     words = text.split(" ")
                     alreadyChecked = []
@@ -138,7 +138,7 @@ class DatasetExplorer:
         
         # Post-infogain filtering according to external stop-lists:
         commonwords = []
-        with open("non_negative_or_positive_connotation_words.txt", 'r') as f:
+        with open("non_negative_or_positive_connotation_words.txt", 'r', encoding='utf-8') as f:
             text = f.read()
             words = text.split("\n")
             commonwords.extend([word.strip(".,!").upper() for word in words])
@@ -161,7 +161,7 @@ class DatasetExplorer:
 
         filename = "keys{}_{}.txt".format(M, self.percentage)
         # Write the keywords to a file:
-        with open("keys/TEST"+filename, "w") as outf:
+        with open("keys/TEST"+filename, "w", encoding='utf-8') as outf:
             i,limit = 0,M
             for word in self.gains.keys():
                 if i < limit:
@@ -197,7 +197,7 @@ class DatasetExplorer:
         limiter = 0
         for filename in os.listdir(negpath):
             if limiter < numOfExamples:
-                with open(os.path.join(negpath, filename), 'r') as f:
+                with open(os.path.join(negpath, filename), 'r', encoding='utf-8') as f:
                     print(os.path.join(pospath, filename))
 
                     text = f.read()
@@ -218,7 +218,7 @@ class DatasetExplorer:
         limiter = 0
         for filename in os.listdir(pospath):
             if limiter < numOfExamples:
-                with open(os.path.join(pospath, filename), 'r') as f:
+                with open(os.path.join(pospath, filename), 'r', encoding='utf-8') as f:
                     print(os.path.join(pospath, filename))
                     text = f.read()
                     words = text.split(" ")
@@ -237,7 +237,7 @@ class DatasetExplorer:
         
         # Create the vector file with the training vectors:
         vectorfilename = "vectors/vectors_keys{}_{}.txt".format(len(keys), float(perc))
-        with open(vectorfilename, "w") as vectorfile:
+        with open(vectorfilename, "w", encoding='utf-8') as vectorfile:
             header = ""
             for key in keys:
                 header += key+","

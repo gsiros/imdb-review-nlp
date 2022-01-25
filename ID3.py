@@ -10,12 +10,6 @@ class ID3Node:
         self.right = None
         # The attribute
         self.attribute = attribute
-        # number of positives
-        self.numPos = 0
-        # number of negatives
-        self.numNeg = 0
-        # sum of positives and negatives
-        self.sum = self.numPos + self.numNeg
         # preset value
         self.preset = None
         
@@ -23,9 +17,6 @@ class ID3Node:
     ## SETTERS ##
     def setPreset(self, preset):
         self.preset = preset
-
-    def setParent(self, parentNode): #no need
-        self.parent = parentNode
 
     def setLeft(self, leftChildNode):
         self.left = leftChildNode
@@ -36,17 +27,7 @@ class ID3Node:
     def setAttribute(self, attribute):
         self.attribute = attribute
 
-    def setNumberOfPositives(self, numOfPositives): # too bad
-        self.numPos = numOfPositives
-        self.sum = self.numPos + self.numNeg
-
-    def setNumberOfNegatives(self, numOfNegatives): # too bad
-        self.numNeg = numOfNegatives
-        self.sum = self.numPos + self.numNeg
-
     ## GETTERS ##
-    def getParent(self):
-        return self.parent
 
     def getLeft(self):
         return self.left
@@ -56,15 +37,6 @@ class ID3Node:
 
     def getAttribute(self):
         return self.attribute
-
-    def getNumberOfPositives(self):
-        return self.numPos
-
-    def getNumberOfNegatives(self):
-        return self.numNeg
-    
-    def getSumOfPosNeg(self):
-        return self.sum
 
     def getPreset(self):
         return self.preset
@@ -96,7 +68,7 @@ class ID3:
         self.desision_tree_root_root = None
 
         # Open the training vector file:
-        with open(trainingVectorsPath, "r") as trainingfile:
+        with open(trainingVectorsPath, "r", encoding='utf-8') as trainingfile:
             lines = trainingfile.readlines()
 
             # Read the keyword line and extract the keywords:
@@ -126,7 +98,7 @@ class ID3:
         rev_vector = [0 for _ in range(len(self.keys)+1)]
 
         # Open the review file:
-        with open(revpath, "r") as revfile:
+        with open(revpath, "r", encoding='utf-8') as revfile:
             rev_text = revfile.read()
             words = rev_text.split(" ")
             for word in words:
@@ -165,7 +137,7 @@ class ID3:
         self.desision_tree_root_root = self.__id3(self.vectors, self.keys, preset, stop_threshold)
 
         
-    # calculate most valuable key and return it
+    # calculate most valuable key via its information gain and return it
     def __bestKey(self, vectors, keys):
         allExamples = len(vectors)
         gains = []
@@ -216,18 +188,23 @@ class ID3:
             return - (prob * math.log2(prob)) - ((1-prob)*math.log2(1-prob))
 
     def __id3(self, trainingVectors, keys, preset, stop_threshold):
-        """(RECURSIVE USE) The main ID3 algorithm.
+        """(RECURSIVE USAGE) The main ID3 algorithm.
         
         trainingVectors -- (list) the training vectors; list of 0-1 lists
         keys -- (list) the key attributes
         preset -- the preset category for classification (1 POS - 0 NEG)
         """
-        # to implement
+        # Create new node to add to the decision tree.
         node = ID3Node()
+        # If there are no training vectors left, return
+        # a dummy node with no keyword attribute and set
+        # its default category.
         if trainingVectors == []:
             node.setPreset(preset)
             return node
 
+        # Count how many of the training vectors are
+        # positive and negative.
         count_pos = 0 
         count_neg = 0
         for item in trainingVectors:
@@ -236,6 +213,9 @@ class ID3:
             else:
                 count_neg += 1
        
+        # If there are no keys left, return the
+        # node with the most common category that
+        # appears in the training vectors.
         if keys == []:
             if count_pos >= count_neg:
                 node.setPreset(True)
@@ -243,19 +223,32 @@ class ID3:
                 node.setPreset(False)
             return node
     
+        # Check if the majority of the training vectors is positive
+        # with respect to the threshold value.
         if (count_pos>0 and (count_neg/count_pos)<= stop_threshold): # 95% of training data are possitive. Stop to avoid overfitting
             node.setPreset(True)
             return node
+        # Check if the majority of the training vectors is negative
+        # with respect to the threshold value.
         if (count_neg>0 and (count_pos/count_neg)<= stop_threshold): # 95% of training data are negative. Stop to avoid overfitting
             node.setPreset(False)
             return node
 
+        # Find the keyword attribute that with the highest
+        # information gain.
         best_key = self.__bestKey(trainingVectors,keys)
-        best_index = keys.index(best_key) # the index of the best key in the key vector
+        # Locate its index in the keywords data structure
+        best_index = keys.index(best_key)
+        
+        # Set the keyword attribute of the node to the
+        # best contributing keyword (found earlier)
         node.setAttribute(best_key)
 
-        with_key = [] #list of reviews containing the key word
-        without_key = [] #list of reviews *not* containing the key word
+        # Split the training vectors to those containing the
+        # best-contributing keyword attribute and those who 
+        # don't:
+        with_key = [] 
+        without_key = [] 
         for item in trainingVectors:
             if item[best_index] == 1:
                 with_key.append(item[:best_index]+item[best_index+1:]) # the attribute selected in this step is no longer useful in the next steps

@@ -7,13 +7,24 @@ from RandForest import Random_Forest
 from DatasetExplorer import DatasetExplorer
 
 class Tester:
+    """Tester class for algorithm statistics"""
     
     def __init__(self, classifier):
         self.classifier = classifier
 
     def buildTestVectorFiles(self, keyNum, trainpospath, trainnegpath):
+        """Method that constructs training data frames and stores them in .txt files.
+        
+        keyNum -- (int) number of keys
+        trainpospath -- (str) path to positive training data folder
+        trainnegpath -- (str) path to negative training data folder
+        """
+
+        # In the [0.002, 0.048] interval the training data used to train
+        # the classifier is crucial to represent its learning curves
+        # thus more sampling is required:
         for percentage in range(2,50,2):
-            print("Building training vector file with {} keys on {}% of training data...".format(keyNum, percentage/1000))
+            print("Building training vector file with {} keys on {}% of training data...".format(keyNum, percentage/10))
             de = DatasetExplorer(12500,percentage/1000)
             de.loadExamples(trainpospath, trainnegpath)
             de.createKeys(keyNum)
@@ -26,6 +37,8 @@ class Tester:
             )
             print("Done!")
         
+        # In the [0.05, 1.0] interval, the error rate is expected to 
+        # have already converged, thus less sampling is required.
         for percentage in range(5,101,5):
             print("Building training vector file with {} keys on {}% of training data...".format(keyNum, percentage))
             de = DatasetExplorer(12500,percentage/100)
@@ -46,7 +59,6 @@ class Tester:
     def run_test(self, keyNum, pospath, negpath):
 
         for percentage in range(2,50,2):
-        
             # counter variables
             total_checked = 0 
             correct = 0
@@ -99,10 +111,10 @@ class Tester:
             
             # calcualte statistics
             print("Saving to file...")
-            with open("test/{}/TRAIN_out_keys{}.txt".format(self.classifier, keyNum),"a") as f:
+            with open("test/{}/TRAIN_out_keys{}.txt".format(self.classifier, keyNum),"a", encoding='utf-8') as f:
                 accuracy = (correct/total_checked)
-                precision = (true_positives)/(true_positives+false_positives)
-                recall = (true_positives)/(true_positives+false_negatives)
+                precision = (true_positives)/(true_positives+false_positives) if true_positives != 0 else 0
+                recall = (true_positives)/(true_positives+false_negatives) if true_positives != 0 else 0
                 f.write("{},{},{},{}\n".format(
                     percentage/1000,
                     round(accuracy, 4),
@@ -165,10 +177,10 @@ class Tester:
             
             # calcualte statistics
             print("Saving to file...")
-            with open("test/{}/TRAIN_out_keys{}.txt".format(self.classifier, keyNum),"a") as f:
+            with open("test/{}/TRAIN_out_keys{}.txt".format(self.classifier, keyNum),"a", encoding='utf-8') as f:
                 accuracy = (correct/total_checked)
-                precision = (true_positives)/(true_positives+false_positives)
-                recall = (true_positives)/(true_positives+false_negatives)
+                precision = (true_positives)/(true_positives+false_positives) if true_positives != 0 else 0
+                recall = (true_positives)/(true_positives+false_negatives) if true_positives != 0 else 0
                 f.write("{},{},{},{}\n".format(
                     percentage/100,
                     round(accuracy, 4),
@@ -178,48 +190,15 @@ class Tester:
             print("Done saving to file!")
 
 
-
-
-"""def test(classifyfunc, pospath, negpath, limiter):
-    i = 0
-    counter = 0 
-    correct = 0
-    for filename in os.listdir(negpath):
-        if i < limiter:
-            path = os.path.join(negpath, filename)
-            print(path)
-            res = classifyfunc(path)
-            if res == False:
-                correct += 1
-            counter += 1
-            i += 1
-        else: 
-            break
-    i = 0
-    for filename in os.listdir(pospath):
-        if i < limiter:
-            path = os.path.join(pospath, filename)
-            print(path)
-            res = classifyfunc(path)
-            if res == True:
-                correct += 1
-            counter += 1
-            i += 1
-        else:
-            break
-        
-    print("--- STATS ---")
-    print("Accuracy:", (correct/counter)*100, "%")"""
-
 #id3 = ID3()
 #ts = Tester(id3)
 #ts.buildTestVectorFiles(50,"aclImdb/train/pos", "aclImdb/train/neg")
 #ts.run_test(50,"aclImdb/train/pos", "aclImdb/train/neg")
 
-nbc = NaiveBayesClassifier()
-ts = Tester(nbc)
+#nbc = NaiveBayesClassifier()
+#ts = Tester(nbc)
 #ts.buildTestVectorFiles(100,"aclImdb/train/pos", "aclImdb/train/neg")
-ts.run_test(70,"aclImdb/train/pos", "aclImdb/train/neg")
+#ts.run_test(70,"aclImdb/train/pos", "aclImdb/train/neg")
 
 #nbc.train("vectors/vectors_keys100_100.txt")
 #test(nbc.classify, "aclImdb/test/pos", "aclImdb/test/neg",10)

@@ -12,7 +12,7 @@ acc2 = []
 precis2 = []
 recall2 = []
 
-with open("test/nbc/TEST_out_keys100.txt", "r") as f:
+with open("test/nbc/TEST_out_keys100.txt", "r", encoding='utf-8') as f:
     lines = f.readlines()
     data = [line.split(",") for line in lines]
     data = sorted(data, key=lambda x : float(x[0]))
@@ -22,7 +22,7 @@ with open("test/nbc/TEST_out_keys100.txt", "r") as f:
     precis = [float(line[2]) for line in data]
     recall = [float(line[3]) for line in data]
 
-with open("test/nbc/TRAIN_out_keys100.txt", "r") as f:
+with open("test/nbc/TRAIN_out_keys100.txt", "r", encoding='utf-8') as f:
     lines = f.readlines()
     data = [line.split(",") for line in lines]
     data = sorted(data, key=lambda x : float(x[0]))
@@ -32,11 +32,12 @@ with open("test/nbc/TRAIN_out_keys100.txt", "r") as f:
     precis2 = [float(line[2]) for line in data]
     recall2 = [float(line[3]) for line in data]
 
+minerr = min(acc)
 plt.plot(perc, acc, '-g', label="test data")
 plt.plot(perc2, acc2, '-b', label="train data")
-#plt.plot(perc, [min(acc) for _ in perc], '--r', label="expected error")
+plt.plot(perc, [min(acc) for _ in perc], '--r', label="minimum error \nachieved ({})".format(round(minerr,2)))
 
-plt.title("Naive Bayes Classifier - {} keys".format(100))
+plt.title("Naive Bayes Classifier - {} keys".format(70))
 plt.xlabel("percentage of training data")
 plt.ylabel("error")
 plt.legend() # required to show the labels

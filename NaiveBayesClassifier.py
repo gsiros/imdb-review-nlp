@@ -16,7 +16,7 @@ class NaiveBayesClassifier:
         self.vectors = []
 
         # Open the training vector file:
-        with open(trainingVectorsPath, "r") as trainingfile:
+        with open(trainingVectorsPath, "r", encoding='utf-8') as trainingfile:
             lines = trainingfile.readlines()
 
             # Read the keyword line and extract the keywords:
@@ -41,7 +41,7 @@ class NaiveBayesClassifier:
         rev_vector = [0 for _ in range(len(self.keys)+1)]
         
         # Open the review file:
-        with open(revpath, "r") as revfile:
+        with open(revpath, "r", encoding='utf-8') as revfile:
             rev_text = revfile.read()
             words = rev_text.split(" ")
             for word in words:
