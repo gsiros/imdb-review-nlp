@@ -4,7 +4,9 @@ class NaiveBayesClassifier:
     def __init__(self):
         self.keys = []
         self.vectors = []
-        self.hc = 0
+        self.key_appearances = []
+        self.positives = 0
+
 
     def train(self, trainingVectorsPath):
         """Method that trains the algorithm from the training vector file provided.
@@ -14,6 +16,7 @@ class NaiveBayesClassifier:
         # Flush data structures for training...
         self.keys = []
         self.vectors = []
+        self.key_appearances = [[[0,0],[0,0]] for _ in self.keys]
 
         # Open the training vector file:
         with open(trainingVectorsPath, "r", encoding='utf-8') as trainingfile:
@@ -30,6 +33,47 @@ class NaiveBayesClassifier:
                 vector = line.strip("\n").split(",")
                 vector = [int(item) for item in vector]
                 self.vectors.append(vector)
+
+        # Prepare the appearance counters for each keyword:
+        self.key_appearances = [[[0,0],[0,0]] for _ in self.keys]
+
+        # Calculate the positive training vector counter:
+        self.positives = sum([1 for vec in self.vectors if vec[-1] == 1])
+
+        for index in range(len(self.keys)):
+            for vector in self.vectors:
+                # If training vector is negative
+                if vector[-1] == 0:
+                    # If vector does not have key
+                    if vector[index] == 0:
+                        # ex. key_appearances[index('BAD')][0][0]
+                        #     == number of training vectors that  
+                        #        are NEGATIVE and DON'T have the
+                        #        keyword 'BAD'
+
+                        # ex. key_appearances[index('BAD')][0][1]
+                        #     == number of training vectors that  
+                        #        are NEGATIVE and DO have the
+                        #        keyword 'BAD'
+
+                        # ex. key_appearances[index('BAD')][1][0]
+                        #     == number of training vectors that  
+                        #        are POSITIVE and DON'T have the
+                        #        keyword 'BAD'
+
+                        # ex. key_appearances[index('BAD')][1][1]
+                        #     == number of training vectors that  
+                        #        are POSITIVE and DO have the
+                        #        keyword 'BAD'
+                        self.key_appearances[index][0][0] += 1
+                    else:
+                        self.key_appearances[index][0][1] += 1
+                else:
+                    # If vector does not have key
+                    if vector[index] == 0:
+                        self.key_appearances[index][1][0] += 1
+                    else:
+                        self.key_appearances[index][1][1] += 1
             
     
     def classify(self, revpath):
@@ -56,66 +100,31 @@ class NaiveBayesClassifier:
 
         #P(C=1|X):
         #P(X=xi | C=1):
-        # Σε πόσα μηνύματα εκπαίδευσης της κατηγορίας c=1
-        # εμφανίζεται η λέξη που αντιστοιχεί στη Xi ;
+        # In how many training examples that are positive (c=1)
+        # does the keyword X appear (xi = 1) or not (xi = 0).
+        # (according to the value xi of the to-be-classified vector).
         
-        # Counters for every keyword in positive reviews:
-        attr_counter_pos = [0 for _ in range(len(self.keys))]
-        # Counter for every keyword in negative reviews:
-        attr_counter_neg = [0 for _ in range(len(self.keys))]
-
-        # For every training vector
-        for vector in self.vectors:
-            # Check every key attribute
-            for i in range(len(self.keys)):
-                # Ff review vector is positive:
-                if vector[-1] == 1:
-                    # if the training vector for a specific keyword
-                    # matches the to-be-classified review vector:
-                    if vector[i] == rev_vector[i]:
-                        # Increase the keyword appearances
-                        # in positive reviews
-                        attr_counter_pos[i] += 1
-                else:
-                    # if the training vector for a specific keyword
-                    # matches the to-be-classified review vector:
-                    if vector[i] == rev_vector[i]:
-                        # Increase the keyword appearances
-                        # in positive reviews
-                        attr_counter_neg[i] += 1
-                            
-
-        # The training vector files created have always
-        # half positive - half negative training vectors,
-        # thus we start with the probability that a training
-        # vector is positive:
-        pc1x = (1/2)
+    
+        # Begin by calculating the probability of
+        # a positive training vector among the training
+        # vectors.
+        pc1x = self.positives / len(self.vectors)
         # For every keyword
-        for counter in attr_counter_pos:
-            # If there exists at least one match:
-            if counter != 0:
-                # Multiply the probability of the review
-                # being positive by the probability of 
-                # the keyword matching considering that the
-                # review is positive.
-                pc1x *= counter / (len(self.vectors ) // 2)
-            else:
-                # If there are no matches for a specific keyword,
-                # we use the Laplace Approximation method:
-                pc1x *= 1 / ((len(self.vectors) // 2) + 2)
+        for i in range(len(self.keys)):
+            # Multiply the product by the probability P(X=xi | C=1):
+            # P(X=xi | C=1) = #appearances in positive vectors with Xi = rev_vector[i] / #positive vectors
+            # Lastlyt, Laplace approximation (in case the #appearances in positive vectors is 0)
+            pc1x *= (1 + self.key_appearances[i][1][rev_vector[i]]) / (self.positives + 2)
 
         # The same for the negative outcome:
-        pc0x = (1/2)
-        for counter in attr_counter_neg:
-            if counter != 0:
-                pc0x *= (counter / (len(self.vectors) // 2))
-            else:
-                pc0x *= (1 / ((len(self.vectors) // 2) + 2))
+        pc0x = (len(self.vectors)-self.positives)/len(self.vectors)
+        for i in range(len(self.keys)):
+            pc0x *= (1 + self.key_appearances[i][0][rev_vector[i]]) / ((len(self.vectors) - self.positives) + 2)
+
 
         # If the probability of the to-be-classified review
         # being positive is greater than that of being negative,
         # classify as positive
-        
         if pc1x > pc0x:
             return True
         else:
