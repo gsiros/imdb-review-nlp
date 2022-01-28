@@ -1,6 +1,9 @@
 # imdb-review-nlp
 Natural Language Processing &amp; Machine Learning Algorithms over IMDB's Review database.
 
+Authors; [Georgios E. Syros](https://www.github.com/gsiros "Georgios' GitHub"), [Anastasios Toumazatos](https://www.github.com/toumazatos "Tasos' GitHub"), [Evgenios Gkritsis](https://www.github.com/eGkritsis "Evgenios' GitHub")
+
+
 ## Batch Classification
 
 ### 1) Prepare the algorithms.
@@ -43,7 +46,6 @@ These result files have entries as rows with the following columns;
 percentage_of_train_data (from 0(0%) to 1(100%)), accuracy, precision, recall
 
 ## Single Classifications
-
 
  - NaiveBayesClassifier:
 
