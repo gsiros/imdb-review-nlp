@@ -10,7 +10,7 @@ perc2 = []
 acc2 = []
 precis2 = []
 recall2 = []
-for i in range(10,11,10):
+for i in range(100,101,10):
     with open("test/nbc/TEST_out_keys{}.txt".format(i), "r", encoding='utf-8') as f:
         lines = f.readlines()
         data = [line.split(",") for line in lines]
@@ -21,15 +21,15 @@ for i in range(10,11,10):
         precis = [float(line[2])*100 for line in data]
         recall = [float(line[3])*100 for line in data]
 
-    with open("Bistas-Christodoulou_naive_bayes/{}.txt".format(i), "r", encoding='utf-8') as f:
+    with open("BIS-CHR-NBC-tests/{}_True.txt".format(i), "r", encoding='utf-8') as f:
         lines = f.readlines()
         data = [line.split(" ") for line in lines]
         #data = sorted(data, key=lambda x : float(x[0]))
             
         perc2 = [float(line[0]) for line in data]
         acc2 = [(float(line[1])) for line in data]
-        #precis2 = [float(line[2])*100 for line in data]
-        #recall2 = [float(line[3])*100 for line in data]
+        precis2 = [float(line[2])*100 for line in data]
+        recall2 = [float(line[3])*100 for line in data]
 
     f1_test = [(2*item[0]*item[1])/(item[0]+item[1]) for item in list(zip(precis, recall))]
     f1_train = [(2*item[0]*item[1])/(item[0]+item[1]) for item in list(zip(precis2, recall2))]

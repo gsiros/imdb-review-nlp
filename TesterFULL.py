@@ -9,10 +9,7 @@ from DatasetExplorer import DatasetExplorer
 class Tester:
     """Tester class for algorithm statistics"""
     
-    def __init__(self, classifier=None):
-        self.classifier = classifier
-
-    def setClassifier(self, classifier):
+    def __init__(self, classifier):
         self.classifier = classifier
 
     def buildTestVectorFiles(self, keyNum, trainpospath, trainnegpath):
@@ -43,7 +40,7 @@ class Tester:
         # In the [0.05, 1.0] interval, the error rate is expected to 
         # have already converged, thus less sampling is required.
         for percentage in range(5,101,5):
-            print("Building training vector file with {} keys on {}% of training data...".format(keyNum, percentage))
+            print("Building training vector file with {} keys on {}% of training data...".format(keyNum, percentage/10))
             de = DatasetExplorer(12500,percentage/100)
             de.loadExamples(trainpospath, trainnegpath)
             de.createKeys(keyNum)
@@ -78,11 +75,12 @@ class Tester:
             print("Running classification tests with {}% of training data...".format(percentage/1000))
 
             i = 0
+            print("Checking negative test cases...")
             # Checking negative revs...
             for filename in os.listdir(negpath):
-                if i < (percentage/1000)*12500:
+                if i < 12500:
                     path = os.path.join(negpath, filename)
-                    print(path)
+                    #print(path)
                     res = self.classifier.classify(path)
                     # If review was classified as negative and IS negative...
                     if res == False:
@@ -93,13 +91,15 @@ class Tester:
                     i+=1
                 else:
                     break
+            print("DONE checking negatives!")
             
             i = 0
+            print("Checking positive test cases...")
             # Checking positive revs...
             for filename in os.listdir(pospath):
-                if i < (percentage/1000)*12500:
+                if i < 12500:
                     path = os.path.join(pospath, filename)
-                    print(path)
+                    #print(path)
                     res = self.classifier.classify(path)
                     # If review was classified as positive and IS positive...
                     if res == True:
@@ -111,10 +111,11 @@ class Tester:
                     i+=1
                 else:
                     break
+            print("DONE checking positives!")
             
             # calcualte statistics
             print("Saving to file...")
-            with open("test/{}/TRAIN_out_keys{}.txt".format(self.classifier, keyNum),"a", encoding='utf-8') as f:
+            with open("test/{}/FULLTEST_out_keys{}.txt".format(self.classifier, keyNum),"a", encoding='utf-8') as f:
                 accuracy = (correct/total_checked)
                 precision = (true_positives)/(true_positives+false_positives) if true_positives != 0 else 0
                 recall = (true_positives)/(true_positives+false_negatives) if true_positives != 0 else 0
@@ -144,10 +145,10 @@ class Tester:
             print("Running classification tests with {}% of training data...".format(percentage/100))
 
             i = 0
-            # Checking negative revs...
             print("Checking negative test cases...")
+            # Checking negative revs...
             for filename in os.listdir(negpath):
-                if i < (percentage/100)*12500:
+                if i < 12500:
                     path = os.path.join(negpath, filename)
                     #print(path)
                     res = self.classifier.classify(path)
@@ -162,10 +163,10 @@ class Tester:
                     break
             print("DONE checking negatives!")
             i = 0
-            # Checking positive revs...
             print("Checking positive test cases...")
+            # Checking positive revs...
             for filename in os.listdir(pospath):
-                if i < (percentage/100)*12500:
+                if i < 12500:
                     path = os.path.join(pospath, filename)
                     #print(path)
                     res = self.classifier.classify(path)
@@ -183,7 +184,7 @@ class Tester:
             
             # calcualte statistics
             print("Saving to file...")
-            with open("test/{}/TRAIN_out_keys{}.txt".format(self.classifier, keyNum),"a", encoding='utf-8') as f:
+            with open("test/{}/FULLTEST_out_keys{}.txt".format(self.classifier, keyNum),"a", encoding='utf-8') as f:
                 accuracy = (correct/total_checked)
                 precision = (true_positives)/(true_positives+false_positives) if true_positives != 0 else 0
                 recall = (true_positives)/(true_positives+false_negatives) if true_positives != 0 else 0
@@ -201,10 +202,10 @@ class Tester:
 #ts.buildTestVectorFiles(50,"aclImdb/train/pos", "aclImdb/train/neg")
 #ts.run_test(50,"aclImdb/train/pos", "aclImdb/train/neg")
 
-#nbc = NaiveBayesClassifier()
-#ts = Tester(nbc)
+nbc = NaiveBayesClassifier()
+ts = Tester(nbc)
 #ts.buildTestVectorFiles(100,"aclImdb/train/pos", "aclImdb/train/neg")
-#ts.run_test(70,"aclImdb/test/pos", "aclImdb/test/neg")
+ts.run_test(100,"aclImdb/test/pos", "aclImdb/test/neg")
 
 #nbc.train("vectors/vectors_keys100_100.txt")
 #test(nbc.classify, "aclImdb/test/pos", "aclImdb/test/neg",10)
