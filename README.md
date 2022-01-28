@@ -8,7 +8,8 @@ Natural Language Processing &amp; Machine Learning Algorithms over IMDB's Review
 Before training the algorithms, we need to create different
 training files with different % of training vectors.
 
-```>>> from Tester import Tester
+```
+>>> from Tester import Tester
 >>> ts = Tester()
 >>> ts.buildTestVectorFiles(X,"aclImdb/train/pos", "aclImdb/train/neg")
 ```
@@ -26,7 +27,8 @@ want to perform tests on with the 'setClassifier' method.
 Finally, can execute the "run_test" method
 to test the algorithm of choice on train/test data:
 
-```>>> from NaiveBayesClassifier import NaiveBayesClassifier
+```
+>>> from NaiveBayesClassifier import NaiveBayesClassifier
 >>> nbc = NaiveBayesClassifier()
 >>> ts.setClassifier(nbc)
 >>> ts.run_test(X,"aclImdb/test/pos", "aclImdb/test/neg")
@@ -51,6 +53,7 @@ percentage_of_train_data (from 0(0%) to 1(100%)), accuracy, precision, recall
  Finally, we can provide a review as a .txt file. ID3 then classifies the 
  review as positive or negative.
  ```
+ >>> from NaiveBayesClassifier import NaiveBayesClassifier
  >>> nbc = NaiveBayesClassifier()
  >>> nbc.train("vectors/vectors_keysX_Y.txt")
  >>> nbc.classify("demo_review.txt")
