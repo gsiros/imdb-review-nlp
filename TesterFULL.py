@@ -40,7 +40,7 @@ class Tester:
         # In the [0.05, 1.0] interval, the error rate is expected to 
         # have already converged, thus less sampling is required.
         for percentage in range(5,101,5):
-            print("Building training vector file with {} keys on {}% of training data...".format(keyNum, percentage/10))
+            print("Building training vector file with {} keys on {}% of training data...".format(keyNum, percentage))
             de = DatasetExplorer(12500,percentage/100)
             de.loadExamples(trainpospath, trainnegpath)
             de.createKeys(keyNum)
@@ -66,10 +66,10 @@ class Tester:
             false_positives = 0
             false_negatives = 0
 
-            print("Training algorithm with {}% of training data...".format(percentage/1000))
+            print("Training algorithm with {}% of training data...".format(percentage/100))
             self.classifier.train("vectors/vectors_keys{}_{}.txt".format(keyNum, percentage/1000))
             if self.classifier.__str__() == 'id3':
-                self.classifier.buildTree()
+                self.classifier.buildTree(preset=True)
             elif self.classifier.__str__() == 'randfor':
                 self.classifier.random_forest(6, 9, True, 0.1)
             print("Running classification tests with {}% of training data...".format(percentage/1000))
@@ -197,15 +197,15 @@ class Tester:
             print("Done saving to file!")
 
 
-#id3 = ID3()
-#ts = Tester(id3)
+id3 = ID3()
+ts = Tester(id3)
 #ts.buildTestVectorFiles(50,"aclImdb/train/pos", "aclImdb/train/neg")
-#ts.run_test(50,"aclImdb/train/pos", "aclImdb/train/neg")
+ts.run_test(20,"aclImdb/test/pos", "aclImdb/test/neg")
 
-nbc = NaiveBayesClassifier()
-ts = Tester(nbc)
+#nbc = NaiveBayesClassifier()
+#ts = Tester(nbc)
 #ts.buildTestVectorFiles(100,"aclImdb/train/pos", "aclImdb/train/neg")
-ts.run_test(100,"aclImdb/test/pos", "aclImdb/test/neg")
+#ts.run_test(100,"aclImdb/test/pos", "aclImdb/test/neg")
 
 #nbc.train("vectors/vectors_keys100_100.txt")
 #test(nbc.classify, "aclImdb/test/pos", "aclImdb/test/neg",10)

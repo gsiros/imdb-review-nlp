@@ -52,7 +52,7 @@ class ID3:
         self.keys = keys
         self.vectors = vectors
         self.gains = {}
-        self.desision_tree_root_root = None
+        self.desision_tree_root = None
         self.hc = 0
 
     def train(self, trainingVectorsPath): 
@@ -65,7 +65,7 @@ class ID3:
         self.keys = []
         self.vectors = []
         self.gains = {}
-        self.desision_tree_root_root = None
+        self.desision_tree_root = None
 
         # Open the training vector file:
         with open(trainingVectorsPath, "r", encoding='utf-8') as trainingfile:
@@ -134,7 +134,7 @@ class ID3:
         """
         # build the tree...
         print("Building decision tree...")
-        self.desision_tree_root_root = self.__id3(self.vectors, self.keys, preset, stop_threshold)
+        self.desision_tree_root = self.__id3(self.vectors, self.keys, preset, stop_threshold)
 
         
     # calculate most valuable key via its information gain and return it
