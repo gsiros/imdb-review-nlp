@@ -1,4 +1,4 @@
-# imdb-review-nlp
+# imdb-review-nlp (beta)
 Natural Language Processing &amp; Machine Learning Algorithms over IMDB's Review database.
 
 Authors; [Georgios E. Syros](https://www.github.com/gsiros "Georgios' GitHub"), [Anastasios Toumazatos](https://www.github.com/toumazatos "Tasos' GitHub"), [Evgenios Gkritsis](https://www.github.com/eGkritsis "Evgenios' GitHub")
