@@ -19,8 +19,7 @@ training files with different % of training vectors.
 
 The buildTestVectorFiles will create training files with X keyword features
 from the training folders provided by the dataset. These files are stored 
-in the "vectors/" folder and look like "vectors_keysX_Y.txt" (Y = percentage
-of training data). 
+in the "vectors/" folder and look like "vectors_keysX_Y.txt" (Y = percentage of training data). 
 
 ### 2) Test the algorithms.
 
@@ -35,12 +34,11 @@ to test the algorithm of choice on train/test data:
 >>> nbc = NaiveBayesClassifier()
 >>> ts.setClassifier(nbc)
 >>> ts.run_test(X,"aclImdb/test/pos", "aclImdb/test/neg")
->>> ts.run_test(X,"aclImdb/test/pos", "aclImdb/test/neg")
 ```
 
 This method outputs result files in the "test/" folder under
 each classifier folder (nbc/id3/randfor). The files look like
-"res_out_keysX.txt".
+"out_keysX.txt".
 
 These result files have entries as rows with the following columns;
 percentage_of_train_data (from 0(0%) to 1(100%)), accuracy, precision, recall
@@ -58,7 +56,7 @@ percentage_of_train_data (from 0(0%) to 1(100%)), accuracy, precision, recall
  >>> from NaiveBayesClassifier import NaiveBayesClassifier
  >>> nbc = NaiveBayesClassifier()
  >>> nbc.train("vectors/vectors_keysX_Y.txt")
- >>> nbc.classify("demo_review.txt")
+ >>> nbc.classify("demo_review_negative.txt")
  False
  ```
 
@@ -76,8 +74,8 @@ percentage_of_train_data (from 0(0%) to 1(100%)), accuracy, precision, recall
  >>> id3 = ID3()
  >>> id3.train("vectors/vectors_keysX_Y.txt")
  >>> id3.buildTree(preset=<True(Positive) or False(Negative)>, stop_threshold=<real number from 0 to 1>)
- >>> id3.classify("demo_review.txt")
- False
+ >>> id3.classify("demo_review_positive.txt")
+ True
  ```
 
  - Random Forest:
@@ -95,6 +93,6 @@ percentage_of_train_data (from 0(0%) to 1(100%)), accuracy, precision, recall
  >>> rf = Random_Forest()
  >>> rf.train("vectors/vectors_keysX_Y.txt")
  >>> rf.random_forest(<number of m random keywords>, <number of trees (forest size)>, preset=<True(Positive) or False(Negative)>, stop_threshold=<real number from 0 to 1>)
- >>> rf.classify("demo_review.txt")
+ >>> rf.classify("demo_review_negative.txt")
  False
  ```

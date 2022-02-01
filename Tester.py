@@ -69,20 +69,20 @@ class Tester:
             false_positives = 0
             false_negatives = 0
 
-            print("Training algorithm with {}% of training data...".format(percentage/1000))
+            print("Training algorithm with {}% of training data...".format(percentage/10))
             self.classifier.train("vectors/vectors_keys{}_{}.txt".format(keyNum, percentage/1000))
             if self.classifier.__str__() == 'id3':
                 self.classifier.buildTree()
             elif self.classifier.__str__() == 'randfor':
                 self.classifier.random_forest(6, 9, True, 0.1)
-            print("Running classification tests with {}% of training data...".format(percentage/1000))
 
             i = 0
             # Checking negative revs...
+            print("Checking negative test cases...")
             for filename in os.listdir(negpath):
                 if i < (percentage/1000)*12500:
                     path = os.path.join(negpath, filename)
-                    print(path)
+                    #print(path)
                     res = self.classifier.classify(path)
                     # If review was classified as negative and IS negative...
                     if res == False:
@@ -93,13 +93,16 @@ class Tester:
                     i+=1
                 else:
                     break
+            print("DONE checking negatives!")
+
             
             i = 0
             # Checking positive revs...
+            print("Checking positive test cases...")
             for filename in os.listdir(pospath):
                 if i < (percentage/1000)*12500:
                     path = os.path.join(pospath, filename)
-                    print(path)
+                    #print(path)
                     res = self.classifier.classify(path)
                     # If review was classified as positive and IS positive...
                     if res == True:
@@ -111,10 +114,11 @@ class Tester:
                     i+=1
                 else:
                     break
+            print("DONE checking positives!")
             
             # calcualte statistics
             print("Saving to file...")
-            with open("test/{}/TRAIN_out_keys{}.txt".format(self.classifier, keyNum),"a", encoding='utf-8') as f:
+            with open("test/{}/out_keys{}.txt".format(self.classifier, keyNum),"a", encoding='utf-8') as f:
                 accuracy = (correct/total_checked)
                 precision = (true_positives)/(true_positives+false_positives) if true_positives != 0 else 0
                 recall = (true_positives)/(true_positives+false_negatives) if true_positives != 0 else 0
@@ -141,7 +145,7 @@ class Tester:
                 self.classifier.buildTree()
             elif self.classifier.__str__() == 'randfor':
                 self.classifier.random_forest(6, 9, True, 0.1)
-            print("Running classification tests with {}% of training data...".format(percentage/100))
+            print("Running classification tests...")
 
             i = 0
             # Checking negative revs...
@@ -183,7 +187,7 @@ class Tester:
             
             # calcualte statistics
             print("Saving to file...")
-            with open("test/{}/TRAIN_out_keys{}.txt".format(self.classifier, keyNum),"a", encoding='utf-8') as f:
+            with open("test/{}/out_keys{}.txt".format(self.classifier, keyNum),"a", encoding='utf-8') as f:
                 accuracy = (correct/total_checked)
                 precision = (true_positives)/(true_positives+false_positives) if true_positives != 0 else 0
                 recall = (true_positives)/(true_positives+false_negatives) if true_positives != 0 else 0
@@ -194,23 +198,3 @@ class Tester:
                     round(recall, 4)
                 ))
             print("Done saving to file!")
-
-
-#id3 = ID3()
-#ts = Tester(id3)
-#ts.buildTestVectorFiles(50,"aclImdb/train/pos", "aclImdb/train/neg")
-#ts.run_test(50,"aclImdb/train/pos", "aclImdb/train/neg")
-
-#nbc = NaiveBayesClassifier()
-#ts = Tester(nbc)
-#ts.buildTestVectorFiles(100,"aclImdb/train/pos", "aclImdb/train/neg")
-#ts.run_test(70,"aclImdb/test/pos", "aclImdb/test/neg")
-
-#nbc.train("vectors/vectors_keys100_100.txt")
-#test(nbc.classify, "aclImdb/test/pos", "aclImdb/test/neg",10)
-
-#rf = Random_Forest()
-#ts = Tester(rf)
-#ts.buildTestVectorFiles(40,"aclImdb/train/pos", "aclImdb/train/neg")
-#ts.run_test(10,"aclImdb/test/pos", "aclImdb/test/neg")
-
