@@ -59,7 +59,7 @@ class Tester:
         print("Done making files!")
 
 
-    def run_test(self, keyNum, pospath, negpath):
+    def run_test(self, keyNum, pospath, negpath, subset_size=None, forest_size=None, preset=True, stop_thershold=0.1):
 
         for percentage in range(2,50,2):
             # counter variables
@@ -72,9 +72,9 @@ class Tester:
             print("Training algorithm with {}% of training data...".format(percentage/10))
             self.classifier.train("vectors/vectors_keys{}_{}.txt".format(keyNum, percentage/1000))
             if self.classifier.__str__() == 'id3':
-                self.classifier.buildTree()
+                self.classifier.buildTree(preset, stop_thershold)
             elif self.classifier.__str__() == 'randfor':
-                self.classifier.random_forest(6, 9, True, 0.1)
+                self.classifier.random_forest(subset_size, forest_size, preset, stop_thershold)
 
             i = 0
             # Checking negative revs...
