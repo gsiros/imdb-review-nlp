@@ -53,7 +53,6 @@ class ID3:
         self.vectors = vectors
         self.gains = {}
         self.desision_tree_root = None
-        self.hc = 0
 
     def train(self, trainingVectorsPath): 
         """Method that trains the algorithm from the training vector file provided.
@@ -75,18 +74,13 @@ class ID3:
             self.keys.extend(lines[0].split(","))
             self.keys.pop(-1)
             lines.pop(0)
-            
-            # Count how many vectors are positive
-            count_pos = 0
+
             # Read the rest of the training vectors and parse them
             # to a list:
             for line in lines:
                 vector = line.strip("\n").split(",")
                 vector = [int(item) for item in vector]
-                count_pos += vector[-1]
                 self.vectors.append(vector)
-            # Calculate the entropy for the positive category:
-            self.hc = self.__binEntropy(count_pos/len(self.vectors))
             
 
     def classify(self, revpath):
@@ -174,7 +168,11 @@ class ID3:
             hcX1 = self.__binEntropy(pC1X1)
             hcX0 = self.__binEntropy(pC1X0)
 
-            gains.append(self.hc - ((prob_of_word*hcX1) + ((1-prob_of_word)*hcX0)))
+            # Calculate initial Binary Entropy H(C)
+            count_pos = count_0_pos + count_1_pos  # count of all positive reviews
+            hc = self.__binEntropy(count_pos / len(vectors))
+
+            gains.append(hc - ((prob_of_word * hcX1) + ((1 - prob_of_word) * hcX0)))
 
         max_gain = max(gains)
         return keys[gains.index(max_gain)] # to be used in buildTree
